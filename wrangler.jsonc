@@ -25,7 +25,13 @@
 
   // 本实例自带 WS 信令：fallback 关闭，否则前端会误显示“流量经服务器中转”的降级提示
   "vars": {
-    "WS_FALLBACK": "false"
+    "WS_FALLBACK": "false",
+
+    // 中继强制走 TCP/TLS：实测该网络 TURN over UDP 只有 12 KB/s，
+    // 同一对设备走 TCP/TLS 中继 100 KB/s（8x）。只影响"打洞失败才中继"那条路，
+    // 保留 STUN ⇒ 能 P2P 直连时仍直连，不受影响。
+    // 若主站实测仍慢（说明是 UDP 直连被 QoS），再打开 RELAY_ONLY="true"。
+    "TURN_FORCE_TCP": "true"
   }
 
   // 需要用 `wrangler secret put` 设置（不要写进文件）：

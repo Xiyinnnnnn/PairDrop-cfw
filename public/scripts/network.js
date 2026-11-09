@@ -497,11 +497,18 @@ class Peer {
         this._chunker = new FileChunker(file,
             chunk => this._send(chunk),
             offset => this._onPartitionEnd(offset));
-        this._chunker.nextPartition();
+        this._reading = false;
+        this._sendOffset = 0;
+        this._ackOffset = 0;
+        this._windowSize = 3 * 4e6; // 允许 3 个分区在途，避免每 4MB 停一次等 RTT
+        this._sendNextPartition();
     }
 
     _onPartitionEnd(offset) {
+        this._reading = false;
+        this._sendOffset = offset;
         this.sendJSON({ type: 'partition', offset: offset });
+        if (this._sendOffset - this._ackOffset < this._windowSize) this._sendNextPartition();
     }
 
     _onReceivedPartitionEnd(offset) {
@@ -509,7 +516,8 @@ class Peer {
     }
 
     _sendNextPartition() {
-        if (!this._chunker || this._chunker.isFileEnd()) return;
+        if (!this._chunker || this._chunker.isFileEnd() || this._reading) return;
+        this._reading = true;
         this._chunker.nextPartition();
     }
 
@@ -534,6 +542,7 @@ class Peer {
                 this._onReceivedPartitionEnd(messageJSON);
                 break;
             case 'partition-received':
+                this._ackOffset = messageJSON.offset;
                 this._sendNextPartition();
                 break;
             case 'progress':
@@ -665,6 +674,7 @@ class Peer {
 
     _onFileTransferCompleted() {
         this._chunker = null;
+        this._reading = false;
         if (!this._filesQueue.length) {
             this._busy = false;
             Events.fire('notify-user', Localization.getTranslation("notifications.file-transfer-completed"));
@@ -1236,7 +1246,7 @@ class FileChunker {
 
     constructor(file, onChunk, onPartitionEnd) {
         this._chunkSize = 64000; // 64 KB
-        this._maxPartitionSize = 1e6; // 1 MB
+        this._maxPartitionSize = 4e6; // 4 MB（原 1 MB：WAN 下 ack 太频繁）
         this._offset = 0;
         this._partitionSize = 0;
         this._file = file;
