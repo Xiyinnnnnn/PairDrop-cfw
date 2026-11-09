@@ -30,7 +30,13 @@ npx wrangler secret put CF_TURN_KEY_ID
 npx wrangler secret put CF_TURN_KEY_API_TOKEN
 ```
 
-Termux：`pkg install -y nodejs libicu`，`bash scripts/patch-workerd.sh`（Android 无 workerd 二进制，deploy 用不到），`bash scripts/deploy.sh`。
+Termux：
+
+```bash
+pkg install -y nodejs libicu
+bash scripts/patch-workerd.sh
+bash scripts/deploy.sh
+```
 
 ## 依赖
 
@@ -43,4 +49,4 @@ Termux：`pkg install -y nodejs libicu`，`bash scripts/patch-workerd.sh`（Andr
 
 ## 协议
 
-GPL-3.0，见 [LICENSE](LICENSE)。PairDrop 以 GPL-3.0 发布，本项目是其衍生作品，分发和改动后仍须沿用 GPL-3.0，不能换成 MIT。
+GPL-3.0，见 [LICENSE](LICENSE)。
