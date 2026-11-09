@@ -1,0 +1,19 @@
+{
+  "name": "pairdrop-cfw",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PairDrop 的 Cloudflare Workers + Durable Objects 移植（1:1 复刻信令协议）",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

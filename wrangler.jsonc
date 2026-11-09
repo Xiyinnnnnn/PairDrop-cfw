@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pairdrop-cfw",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+
+  // 静态资源：上游 public/ 原样托管（PWA、service-worker、语言包都不用改）
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/server", "/ip", "/config"]
+  },
+
+  // 单 DO 承载全部房间，等价于原版的"单进程"
+  "durable_objects": {
+    "bindings": [
+      { "name": "SIGNALING", "class_name": "SignalingServer" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["SignalingServer"] }
+  ],
+
+  "observability": { "enabled": true },
+
+  // 本实例自带 WS 信令：fallback 关闭，否则前端会误显示“流量经服务器中转”的降级提示
+  "vars": {
+    "WS_FALLBACK": "false"
+  }
+
+  // 需要用 `wrangler secret put` 设置（不要写进文件）：
+  //   CF_TURN_KEY_ID / CF_TURN_KEY_API_TOKEN
+}
