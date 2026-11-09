@@ -43,14 +43,4 @@ Termux：`pkg install -y nodejs libicu`，`bash scripts/patch-workerd.sh`（Andr
 
 ## 协议
 
-| 项 | 值 |
-|---|---|
-| client→server 分支 | 24/24 |
-| server→client 下发类型 | 16/16 |
-| 入房方式 | 同 IP 自动、5 位房间号、配对码、房间密钥 |
-| 心跳 | DO `alarm` 60s 巡检，3min 无响应断开（上游 `setInterval` 1s） |
-| 休眠 | 状态存 websocket attachment，唤醒重建房间表（上游进程内存） |
-| 哈希 | HMAC-SHA256 加盐（上游 SHA3-512，Workers 无 SHA3） |
-| `display-name-changed` | 移出 `wsFallback` 闸门，改名实时同步；其余分支与闸门位置照抄 |
-
-GPL-3.0，见 [LICENSE](LICENSE)。
+GPL-3.0，见 [LICENSE](LICENSE)。PairDrop 以 GPL-3.0 发布，本项目是其衍生作品，分发和改动后仍须沿用 GPL-3.0，不能换成 MIT。
