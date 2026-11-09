@@ -25,18 +25,29 @@
 | 部署 | 单 Worker + 单 DO，无数据库、无容器、无常驻进程 |
 | 费用 | Workers Free 档可跑：10 万请求/天、静态资源不计请求、TURN 出向 1000 GB/月 |
 
-## 项目依赖
+## 运行环境
 
 | 依赖 | 版本/条件 | 必需 | 用途 |
 |---|---|---|---|
 | Cloudflare 账号 | 免费档即可 | 是 | Workers + Durable Objects（SQLite 后端，免费档唯一可选） |
-| Node.js | ≥ 20（本地实测 26.13.0） | 是 | 运行 `wrangler`；Android/Termux 需同版本 `libicu` |
+| Node.js | ≥ 20（本地实测 26.13.0） | 是 | 运行 `wrangler`；Android/Termux 需同大版本 `libicu` |
 | wrangler | ^4（本地实测 4.158.0） | 是 | 打包、部署、写 secret |
 | python3 | ≥ 3.8 | 否 | 仅 `scripts/patch-workerd.sh` 用（Android 打桩） |
 | Cloudflare TURN key | 免费 | 否 | 跨网直连失败时的中继；不配置则只下发 STUN |
-| 域名 | 任意 | 否 | 默认用 `*.workers.dev`；生产建议绑自有域名 |
+| 域名 | 任意 | 否 | 默认 `*.workers.dev`；生产建议绑自有域名 |
 
-运行时不引入任何 npm 依赖：`src/` 只用 Workers 运行时 API，`public/` 为上游静态资源原样托管。
+`src/` 不引入任何 npm 运行时依赖，只用 Workers 运行时 API。
+
+## 项目依赖（参考仓库）
+
+| 仓库 | 许可 | 本项目用到的部分 |
+|---|---|---|
+| [schlagmichdoch/PairDrop](https://github.com/schlagmichdoch/PairDrop) | GPL-3.0 | **唯一实际来源**：`public/` 前端原样托管；`server/` 的信令分支、Peer 身份与命名、房间结构、心跳语义按 1:1 移植到 Worker/DO |
+| [tylermercer/quickshare-durable-objects](https://github.com/tylermercer/quickshare-durable-objects) | MIT | 选型阶段的调研参考：Durable Object 承载 WebSocket 信令的写法（未复用代码，且其未用 Hibernation，本项目改用 Hibernation API） |
+| [darklinden/snapdrop-cf-worker](https://github.com/darklinden/snapdrop-cf-worker) | 未声明 | 选型阶段的调研参考：Snapdrop 在 Worker 上的最小实现（未复用代码） |
+| [iamkunal9/p2p-file-share](https://github.com/iamkunal9/p2p-file-share) | MIT | 选型阶段的调研参考：Workers 上的 P2P 信令骨架（未复用代码） |
+
+仓库内无 vendored 上游源码：`public/` 为上游静态资源原样托管并保留其 GPL-3.0 版权，`src/` 为阅读上游实现后的 Workers 重写。
 
 ## 快速部署
 
